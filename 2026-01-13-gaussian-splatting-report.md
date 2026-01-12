@@ -1,57 +1,102 @@
-# Gaussian Splatting Report: From Capture to Reconstruction
+# Gaussian Splatting: From Capture to Reconstruction
 
-## 1. Introduction
-This report details the process of generating a 3D reconstruction using Gaussian Splatting, starting from initial data capture to the final splat generation. The objective is to outline the methodology employed, tools utilized, and specific parameters configured at each stage.
+## Abstract
+*   **Objective:** Document the methodology for 3D scene reconstruction using Gaussian Splatting.
+*   **Process:**
+    *   Data Acquisition (360° Camera)
+    *   Image Preprocessing
+    *   Structure from Motion (SfM)
+    *   Gaussian Point Cloud Optimization
+*   **Content:** Details tools, parameters, and system specifications.
+*   **Key Finding:** Processing limitations were identified and addressed.
 
-## 2. Data Acquisition
-The initial data for this Gaussian Splatting project was acquired using an **Insta360 X5 camera**. The camera was operated in **Equirectangular 360 camera mode**, capturing a full spherical view of the environment. The raw footage from the camera was first processed using the **Insta360 Editor** software. During the export process, it is crucial to select the option to export as **360 videos** and to make sure that **Stabilization Type > Direction Lock is turned on** to ensure consistent video orientation. This exported **MP4 video file** then served as the primary source material for subsequent processing steps.
+## Introduction
+*   **Purpose:** Document the end-to-end workflow for a Gaussian Splatting 3D scene reconstruction.
+*   **Scope:** From initial video capture to the final optimized Gaussian point cloud.
+*   **Focus:** Procedural account of tools, configurations, and key decisions.
 
-It is worth noting that the introductory video for the Blender 360 Extractor addon suggested capturing footage using three synchronous 360 cameras (positioned high, middle, and low) for optimal results. While the addon's author indicated that separate recordings could also be used, due to hardware limitations, only a single Insta360 X5 camera was utilized for data acquisition in this project.
-
-
-## 3. Data Preprocessing (Image Extraction and Cropping)
-Following data acquisition, the raw MP4 video was processed to extract individual frames and prepare them for 3D reconstruction. This preprocessing step involved using **Blender** with the **360 Extractor addon**. Within Blender, a virtual camera was configured to crop specific views from the equirectangular footage. A crucial aspect of this stage was setting the virtual camera's output to a **1:1 aspect ratio**, specifically **1920 pixels** in width and height. This particular resolution and aspect ratio were chosen based on recommendations suggesting that a 1:1 ratio is beneficial for subsequent processing steps, leading to a better overall fit in the Gaussian Splatting pipeline.
-
-### Caveats
-*   **(Please describe specific issues for this section here)**
-
-
-
-## 4. Structure from Motion (SfM) Data Extraction
-With the prepared images from the preprocessing stage, **COLMAP** was utilized to perform Structure from Motion (SfM). COLMAP is an open-source MVS (Multi-View Stereo) pipeline that reconstructs 3D scenes and estimates camera poses from a set of ordered images. In this phase, COLMAP analyzed the cropped images to:
-*   Identify and match common features across multiple views.
-*   Estimate the intrinsic and extrinsic parameters of the virtual camera for each image (camera poses).
-*   Reconstruct a sparse 3D point cloud representing the geometric structure of the scene.
-
-The output from COLMAP, including the camera parameters and the sparse point cloud, served as critical input for the subsequent Gaussian Splatting generation step.
-
-### Caveats
-*   **(Please describe specific issues for this section here)**
-
-
-
-## 5. Gaussian Splatting Generation
-The final stage of the pipeline involved generating the 3D Gaussian Splats. This was achieved by importing the outputs from COLMAP (camera poses and sparse point cloud) into **PostShot**. PostShot is a platform that takes the SfM data and leverages it to create a dense 3D representation using Gaussian Splatting. The process involved:
-*   Loading the COLMAP project, which contains the reconstructed camera positions and the initial sparse point cloud.
-*   PostShot then optimized the Gaussian primitives to represent the scene, iteratively refining their position, color, opacity, and covariance to accurately reproduce the input images from novel viewpoints.
-
-This step effectively transformed the structural information derived from COLMAP into a renderable, high-fidelity 3D Gaussian Splatting model.
-
-### Caveats
-*   **(Please describe specific issues for this section here)**
-
-
-
-## 6. System Specifications
-The Gaussian Splatting pipeline was executed on the following system configuration:
-
-*   **Device Name:** DESKTOP-GF31VVN
-*   **Processor:** 13th Gen Intel(R) Core(TM) i7-13620H (2.40 GHz)
-*   **Installed RAM:** 32.0 GB (31.6 GB usable)
+## System Specifications
+*   **Device:** DESKTOP-GF31VVN
+*   **CPU:** 13th Gen Intel(R) Core(TM) i7-13620H @ 2.40 GHz
+*   **RAM:** 32.0 GB
 *   **GPU:** NVIDIA GeForce RTX 4060 Laptop GPU
 *   **VRAM:** 8.0 GB (Dedicated)
-*   **System Type:** 64-bit operating system, x64-based processor
-*   **Pen and Touch Support:** No
 
+## Methodology: Data Acquisition
+*   **Hardware:** Insta360 X5 Camera
+*   **Mode:** Equirectangular 360° Video
+*   **Initial Processing:** Insta360 Editor
+    *   **Export Format:** 360 Video (MP4)
+    *   **Stabilization:** Direction Lock enabled to ensure consistent orientation.
+*   **Note:** A single camera was used due to hardware limitations, differing from multi-camera recommendations.
 
+## Recommendations: Data Acquisition
+*   **Lens:** Use a lens with minimal distortion effects.
+*   **Camera Mode:** Use manual mode to ensure consistent settings (exposure, focus, white balance) across all captures.
+*   **Capture Method:**
+    *   Prioritize still photographs over video to avoid motion blur.
+    *   If using video, ensure smooth and gentle camera movement.
+*   **Shooting Strategy:**
+    *   Begin with object-centric captures, as they tend to yield better results.
+    *   Proceed to background or indoor scenes after validating the initial process.
 
+## Methodology: Image Preprocessing
+*   **Software:** Blender with 360 Extractor addon.
+*   **Process:** A virtual camera extracted cropped views from the 360° video.
+*   **Configuration:**
+    *   **Output Resolution:** 1920x1920 pixels
+    *   **Aspect Ratio:** 1:1
+*   **Reason:** This ratio is recommended for optimal performance in the Gaussian Splatting pipeline.
+
+## Methodology: Structure from Motion (SfM)
+*   **Software:** COLMAP (Open-source SfM/MVS pipeline).
+*   **Input:** Preprocessed 1920x1920 images.
+*   **Key Operations:**
+    *   Feature identification and matching.
+    *   Camera pose estimation (intrinsic/extrinsic parameters).
+    *   Sparse 3D point cloud reconstruction.
+*   **Output:** Camera parameters and sparse point cloud for the next stage.
+
+## Methodology: Gaussian Splatting Generation
+*   **Software:** PostShot.
+*   **Input:** COLMAP project data (camera poses & sparse point cloud).
+*   **Process:**
+    *   Optimized a set of Gaussian primitives to represent the scene.
+    *   Iteratively refined position, color, opacity, and covariance via gradient descent.
+*   **Output:** A high-fidelity, renderable, optimized Gaussian point cloud.
+
+## Results and Discussion
+*   **Processing Challenge:**
+    *   Initial attempts to process ~1000 images with COLMAP led to instability on Windows and prohibitive processing times on Ubuntu.
+*   **Solution:**
+    *   The image set was reduced to ~300 frames, which enabled successful processing.
+    *   This corresponds to 30 seconds of footage (5 virtual cameras @ 2 fps).
+*   **Rendering Validation:**
+    *   The final optimized Gaussian point cloud should be validated by rendering both:
+        *   **Training Views:** Images used during the optimization process.
+        *   **Test/Novel Views:** New viewpoints not seen during optimization, to assess generalization.
+    *   *(Note: The current process should be clarified whether it uses a train/test split or optimizes on all images before rendering novel views.)*
+
+## Conclusion
+*   **Outcome:** Successfully reconstructed a 3D scene as an optimized Gaussian point cloud from a single 360° video.
+*   **Workflow:** Utilized a pipeline of specialized tools (Insta360 Editor, Blender, COLMAP, PostShot).
+*   **Key Finding:** Input image quantity must be balanced with hardware capabilities for the SfM stage.
+*   **Viability:** The process is a viable method for generating Gaussian point clouds with consumer-grade hardware.
+
+## Future Work: Workflow Improvements
+*   **Improve Accuracy with Manual COLMAP Configuration:**
+    *   **Hypothesis:** Providing COLMAP with known camera rig information from the 360 Extractor will improve reconstruction accuracy.
+    *   **Action:**
+        1.  Generate a reconstruction *with* manual COLMAP rig parameters.
+        2.  Generate a baseline reconstruction *without* manual parameters.
+        3.  Render the same novel views from both resulting point clouds.
+    *   **Evaluation:** The two outputs will be compared quantitatively using the following perceptual metrics:
+        *   **PSNR (Peak Signal-to-Noise Ratio):** Measures pixel-level error. Higher is better.
+        *   **SSIM (Structural Similarity Index Measure):** Measures perceived structural similarity. Closer to 1 is better.
+        *   **LPIPS (Learned Perceptual Image Patch Similarity):** Measures perceptual similarity using a deep learning model. Closer to 0 is better.
+
+## References
+*   Insta360 Editor
+*   Blender 360 Extractor Addon
+*   COLMAP
+*   PostShot
