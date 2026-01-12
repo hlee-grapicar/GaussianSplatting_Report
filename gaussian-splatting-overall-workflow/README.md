@@ -33,6 +33,7 @@
 
 ## Methodology: Data Acquisition
 *   **Hardware:** Insta360 X5 Camera
+*   **Purpose:** To capture a comprehensive visual record of the target scene. The 360° video format provides a dense dataset from a single pass, which is foundational for reconstructing the environment from all angles.
 <p align="center">
   <img src="insta360-x5.png" alt="Equirectangular Frame from 360 Video" width="300"/>
   <br>
@@ -81,6 +82,7 @@
 
 ## Methodology: Image Preprocessing
 *   **Software:** [Blender with 360 Extractor addon](https://toppinappi.gumroad.com/l/360extractor).
+*   **Purpose:** To convert the 360° equirectangular video into a series of standard, flat (pinhole) images. SfM software like COLMAP requires these traditional image formats to perform feature matching and camera pose estimation effectively. This step essentially simulates a multi-camera rig, generating the necessary input for the SfM pipeline.
 
 
 <p align="center">
@@ -107,6 +109,7 @@
 
 ## Methodology: Structure from Motion (SfM)
 *   **Software:** [COLMAP](https://colmap.github.io/) (Open-source SfM pipeline).
+*   **Purpose:** To calculate the 3D structure of the scene from the 2D images. This critical process estimates the precise position and orientation of each virtual camera and generates a sparse 3D point cloud. This output serves as the geometric foundation, or "skeleton," upon which the Gaussian Splatting model is built.
 
 
 <p align="center">
@@ -130,6 +133,7 @@
 
 ## Methodology: Gaussian Splatting Generation
 *   **Software:** [PostShot](https://www.jawset.com/).
+*   **Purpose:** To transform the sparse point cloud and camera poses from COLMAP into a dense, photorealistic, and renderable 3D scene. This stage creates millions of 3D Gaussians and optimizes their properties (e.g., position, color, opacity, size) to reconstruct the scene's appearance and geometry with high fidelity.
 
 
 <p align="center">
