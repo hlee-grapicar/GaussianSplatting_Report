@@ -76,7 +76,8 @@
 *   **Shooting Strategy:**
     *   Initial focus: Object-centric captures (tends to yield better results).
     *   Subsequent focus: Progress to background/indoor scenes after initial validation.
-*   **Captures** Maximize overlap between frames, but minimize overlap between cameras within the same frame.
+*   **Captures:**
+    *   Maximize overlap between frames, but minimize overlap between cameras within the same frame.
 
 ## Methodology: Image Preprocessing
 *   **Software:** [Blender with 360 Extractor addon](https://toppinappi.gumroad.com/l/360extractor).
