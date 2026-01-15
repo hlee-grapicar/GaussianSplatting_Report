@@ -26,6 +26,7 @@
 ## System Specifications
 | Component | Specification |
 | :---------- | :------------------------------------------- |
+| OS | Windows 11 |
 | CPU | 13th Gen Intel(R) Core(TM) i7-13620H @ 2.40 GHz |
 | RAM | 32.0 GB |
 | GPU | NVIDIA GeForce RTX 4060 Laptop GPU |

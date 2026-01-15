@@ -1,0 +1,122 @@
+[
+  {
+    "cameras": [
+      {
+        "image_prefix": "High_Cam01/",
+        "ref_sensor": true
+      },
+      {
+        "image_prefix": "High_Cam02/",
+        "cam_from_rig_rotation": [
+          0.9238795135053854,
+          -2.382998107938637e-08,
+          0.3696438101932445,
+          -0.09904593939618374
+        ],
+        "cam_from_rig_translation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "image_prefix": "High_Cam06/",
+        "cam_from_rig_rotation": [
+          -0.3826834683946593,
+          -1.1668649099714915e-07,
+          0.8923990742296036,
+          -0.23911766001608162
+        ],
+        "cam_from_rig_translation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "image_prefix": "High_Cam07/",
+        "cam_from_rig_rotation": [
+          0.7071067779544057,
+          6.337019646606994e-08,
+          -0.6830127225449408,
+          0.18301263730322745
+        ],
+        "cam_from_rig_translation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "image_prefix": "High_Cam08/",
+        "cam_from_rig_rotation": [
+          0.9238795510768407,
+          5.130503020770528e-08,
+          -0.36964380805364977,
+          0.09904559692206917
+        ],
+        "cam_from_rig_translation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "image_prefix": "Low_Cam01/",
+        "cam_from_rig_rotation": [
+          0.9330127011750289,
+          0.24999992790149703,
+          -0.25881911732968405,
+          -7.552660991602186e-08
+        ],
+        "cam_from_rig_translation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "image_prefix": "Low_Cam02/",
+        "cam_from_rig_rotation": [
+          0.9576622732569476,
+          0.2566046608168785,
+          0.13052593009560123,
+          -2.6140612965523234e-07
+        ],
+        "cam_from_rig_translation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "image_prefix": "Low_Cam07/",
+        "cam_from_rig_rotation": [
+          -0.48296294273554935,
+          -0.12940964593471374,
+          0.8660253688450865,
+          4.773895377863983e-08
+        ],
+        "cam_from_rig_translation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "image_prefix": "Low_Cam08/",
+        "cam_from_rig_rotation": [
+          0.7663204743255236,
+          0.20533501503808987,
+          -0.6087614165079869,
+          3.261770178372959e-08
+        ],
+        "cam_from_rig_translation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    ]
+  }
+]
