@@ -1,14 +1,8 @@
 # Experiment: Manual Camera Intrinsics in COLMAP
 
-<p align="center">
-  <!-- <img src="placeholder-visual-abstract.png" alt="Visual Abstract" width="800"/> -->
-  <br>
-  <em>Figure 0: Overview of the manual intrinsic calibration experiment (Placeholder).</em>
-</p>
-
 ## Abstract
 *   **Objective:** Evaluate the impact of manually defining camera intrinsics versus COLMAP's automatic deduction.
-*   **Hypothesis:** Explicit parameterization of the camera model (Pinhole) improves reconstruction accuracy and processing speed for synthetic/fixed views.
+*   **Hypothesis:** Explicit parameterization of the camera improves reconstruction accuracy and processing speed for synthetic/fixed views.
 *   **Process:**
     *   Theoretical calculation of intrinsic parameters.
     *   Manual enforcement via COLMAP CLI/GUI.
@@ -16,7 +10,7 @@
 *   **Key Finding:** Manually enforcing a `PINHOLE` model and a zero-translation rig configuration significantly improves reconstruction stability, resulting in a 3x increase in sparse point density and visibly sharper textures in the final Gaussian Splatting output.
 
 ## Motivation
-*   **Source:** [Reports](https://github.com/kyowon1108/gsplat-onthefly-nvs-study) suggesting that manual intrinsic specification can significantly enhance the quality of the final rendered Gaussian Splatting scene.
+*   **Source:** A [Report](https://github.com/kyowon1108/gsplat-onthefly-nvs-study) suggesting that manual intrinsic specification can significantly enhance the quality of the final rendered Gaussian Splatting scene.
 *   **Goal:** Test the hypothesis that providing ground-truth or manually calculated parameters leads to a superior reconstruction compared to COLMAP's automatic estimation.
 
 ## Introduction
@@ -27,21 +21,22 @@
     *   Input images are generated via Blender (virtual camera), meaning "perfect" ground truth intrinsics are theoretically available.
 
 ## System Specifications
-| Component | Specification |
-| :---------- | :------------------------------------------- |
-| OS | Windows 11 |
-| CPU | 13th Gen Intel(R) Core(TM) i7-13620H @ 2.40 GHz |
-| RAM | 32.0 GB |
-| GPU | NVIDIA GeForce RTX 4060 Laptop GPU |
-| VRAM | 8.0 GB (Dedicated) |
+| Component | Specification                                   |
+| :-------- | :---------------------------------------------- |
+| OS        | Windows 11                                      |
+| CPU       | 13th Gen Intel(R) Core(TM) i7-13620H @ 2.40 GHz |
+| RAM       | 32.0 GB                                         |
+| GPU       | NVIDIA GeForce RTX 4060 Laptop GPU              |
+| VRAM      | 8.0 GB (Dedicated)                              |
 
 ## Methodology: Intrinsic Calculation
 *   **Source:** Blender 360 Extractor settings.
 *   **Camera Model:** `PINHOLE`
     *   This model was chosen because the input consists of "perfect" virtual renders rather than physical lens captures.
+    *   **Definition:** The [Pinhole model](https://colmap.github.io/cameras.html) is the simplest projection model, defined solely by Focal Length ($f_x, f_y$) and Principal Point ($c_x, c_y$). It assumes a perfect projection with no radial or tangential distortion, making it ideal for synthetic data.
 *   **Parameters:**
     *   **Resolution:** $1920 \times 1920$
-    *   **Focal Length ($f_x, f_y$):** $960$ (calculated as half of the image resolution, corresponding to a 90° FOV).
+    *   **Focal Length ($f_x, f_y$):** $960, 960$ (calculated as half of the image resolution, corresponding to a 90° FOV).
     *   **Principal Point ($c_x, c_y$):** $960, 960$ (geometric center of the image).
 
 ## Methodology: COLMAP Configuration
@@ -50,15 +45,15 @@
 *   **Environment Variables:**
     The following placeholders are used in the commands below to represent local file paths:
     *   `${DATABASE_PATH}`: Path to the SQLite database (e.g., `database.db`)
-    *   `${IMAGE_PATH}`: Root directory of the input images (e.g., `images_by_camera/`)
-    *   `${RIG_CONFIG_PATH}`: Path to the JSON rig configuration (e.g., `rig_config.json`)
+    *   `${IMAGE_PATH}`: Root directory of the input images (e.g., `images/`)
+    *   `${RIG_CONFIG_PATH}`: Path to the JSON rig configuration that COLMAP requires when setting rigs(e.g., `rig_config.json`)
     *   `${OUTPUT_PATH}`: Directory for the sparse reconstruction output (e.g., `sparse/`)
 
 *   **Tooling Choice:** 
     *   **CLI Enforcement:** Since the COLMAP GUI does not support the explicit configuration of camera rigs and their associated intrinsic parameters, the **Command Line Interface (CLI)** was utilized for the extraction and matching phases.
 
 *   **Feature Extraction Process:**
-    *   **Command (PowerShell):**
+    *   **Command :**
         ```powershell
         colmap feature_extractor \
           --database_path ${DATABASE_PATH} \
@@ -69,13 +64,13 @@
           --FeatureExtraction.use_gpu 1
         ```
     *   **Key Parameter Logic:**
-        *   `--ImageReader.single_camera_per_folder 1`: Ensures that images categorized into folders (the 5 virtual cameras) are treated as distinct camera sensors.
+        *   `--ImageReader.single_camera_per_folder 1`: Ensures that images categorized into folders (the 9 virtual cameras) are treated as distinct camera sensors.
         *   `--ImageReader.camera_model PINHOLE`: Forces the simple pinhole model appropriate for virtual renders.
         *   `--ImageReader.camera_params "960,960,960,960"`: Explicitly sets $f_x, f_y, c_x, c_y$ to the pre-calculated ground truth values.
         *   `--FeatureExtraction.use_gpu 1`: Leverages the RTX 4060 for performance.
 
 *   **Rig Configuration Process:**
-    *   **Command (PowerShell):**
+    *   **Command :**
         ```powershell
         colmap rig_configurator \
           --database_path ${DATABASE_PATH} \
@@ -83,17 +78,32 @@
         ```
     *   **Implementation Detail:**
         *   The Blender 360 Extractor addon can export a camera group template (e.g., `camera_groups_20XX-XX-XX.json`).
-        *   **CRITICAL:** When converting this template to COLMAP's `rig_config.json` format, the translation vector for every camera must be manually overridden to:
+        *   **CRITICAL:** When converting this template to COLMAP's `rig_config.json` format from equi-rectangular video, the translation vector for every camera must be manually overridden to:
           `"cam_from_rig_translation": [0.0, 0.0, 0.0]`
-        *   This ensures COLMAP treats the rig as a single nodal point, matching the physical reality of the equirectangular source.
-    *   **Purpose:** Explicitly defines the spatial relationship between the 5 virtual cameras. Since the "rig" (the Blender extraction setup) is fixed for every frame, this ensures COLMAP respects the constant relative pose between sensors, significantly constraining the search space for camera estimation.
+        *   This ensures COLMAP treats the rig as a single nodal point, matching the physical reality of the equi-rectangular source.
+    *   **Purpose:** Explicitly defines the spatial relationship between the 9 virtual cameras. Since the "rig" (the Blender extraction setup) is fixed for every frame, this ensures COLMAP respects the constant relative pose between sensors, significantly constraining the search space for camera estimation.
 
     *   **Caveats: The 360° Rig Paradigm**
         *   **The Zero-Translation Reality:**
-            *   Since the input footage originates from a single 360° camera (equirectangular video), all extracted pinhole views effectively share the exact same optical center.
-            *   **The Addon Default Problem:** By default, the Blender 360 Extractor addon generates a camera group arranged in a ring (see `Screenshot 2026-01-16 053016.png`). This layout includes spatial translation between cameras.
-            *   **Why it Fails:** Using the default ring layout for 360° video introduces "fake" parallax. COLMAP will attempt to solve for translations that do not exist in the source equirectangular projection, leading to reconstruction errors or failure to converge.
-            *   **The Solution:** The cameras must be manually or programmatically moved to a **coincident position** ($T = [0, 0, 0]$). In this setup, the rig is defined purely by the **Rotational** differences required to sample different quadrants of the sphere (see the corrected layout in `Screenshot 2026-01-16 052947.png`).
+            *   Since the input footage originates from a single 360° camera (equi-rectangular video), all extracted pinhole views effectively share the exact same optical center.
+            *   **The Addon Default Problem:** By default, the Blender 360 Extractor addon generates a camera group arranged in a ring. This layout includes spatial translation between cameras.
+            
+            <p align="center">
+              <img src="blender-default-ring-layout.png" alt="Blender Addon Default Ring Layout" width="600"/>
+              <br>
+              <em>Figure 5: The default Blender addon export showing artificial spatial translation.</em>
+              <br/> <b>Note:</b> I actually used 9 virtual cameras(5 for high, 4 for low), this image and one below is just for the explanation.
+            </p>
+
+            *   **Why it Fails:** Using the default ring layout for 360° video introduces "fake" parallax. COLMAP will attempt to solve for translations that do not exist in the source equi-rectangular projection, leading to reconstruction errors or failure to converge.
+            *   **The Solution:** The cameras must be manually or programmatically moved to a **coincident position** ($T = [0, 0, 0]$). In this setup, the rig is defined purely by the **Rotational** differences required to sample different quadrants of the sphere.
+
+            <p align="center">
+              <img src="blender-corrected-coincident-layout.png" alt="Corrected Coincident Layout" width="600"/>
+              <br>
+              <em>Figure 6: The corrected coincident layout where all cameras share the same nodal point. <br/> <b>Note:</b> This layout does not need to be physically set in Blender; it is sufficient to "pretend" the cameras are coincident by overriding the translation values in the COLMAP <code>rig_config.json</code>.</em>
+            </p>
+
             *   **Implication for COLMAP:** In the `rig_config.json`, the translation parameters between the cameras should always be set to zero.
 
         *   **JSON Configuration Comparison:**
@@ -173,32 +183,40 @@
 
 ## Results and Discussion
 *   **Observation:** 
-    *   **Success (Rig Constrained):** When the `rig_config.json` was correctly applied with zero translation, COLMAP produced a "star" pattern where all frustums for a single pose share a common origin (see `Screenshot 2026-01-16 022730.png`).
-    *   **Failure (Default/Unconstrained):** Without the rig constraint or with incorrect translations, COLMAP treats each camera as an independent entity. This results in a scattered, disorganized reconstruction with lower point density (see `Screenshot 2026-01-16 054304.png`).
+    *   **Success (Rig Constrained):** When the `rig_config.json` was correctly applied with zero translation, COLMAP produced a "star" pattern where all frustums for a single pose share a common origin.
+    *   **Failure (Default/Unconstrained):** Without the rig constraint or with incorrect translations, COLMAP treats each camera as an independent entity, resulting in a scattered, disorganized reconstruction with lower point density.
+
+<p align="center">
+  <img src="colmap-gui-unconstrained-failure.png" alt="COLMAP GUI Unconstrained Failure" width="45%"/> <img src="colmap-gui-rigged-success.png" alt="COLMAP GUI Rigged Success" width="45%"/>
+  <br>
+  <em>Figure 7: COLMAP GUI Comparison.   <br><b>Left:</b> Failure - Unconstrained reconstruction.   <br><b>Right:</b> Success - Rigged reconstruction with shared nodal point.</em>
+</p>
+
+<p align="center">
+  <img src="sparse-reconstruction-unconstrained.png" alt="Unrigged Sparse Reconstruction (Failure)" width="45%"/> <img src="sparse-reconstruction-rigged.png" alt="Rigged Sparse Reconstruction (Success)" width="45%"/>
+  <br>
+  <em>Figure 4: Sparse Reconstruction Comparison.   <br><b>Left:</b> Failure - Lack of constraints leads to trajectory drift and scattered cameras.   <br><b>Right:</b> Success - The rig constraint forces a shared nodal point.</em>
+</p>
+
 *   **Performance:**
     *   **Rig Constrained:** 40 Frames (360 Images) yielded ~60,000 points. The shared nodal point constraint significantly reduced the degrees of freedom, leading to a more stable and dense sparse cloud.
     *   **Unconstrained:** 317 Frames (317 Images) yielded only ~22,000 points. The lack of geometric constraints made it harder for COLMAP to find a consistent global solution for the virtual 360° setup.
 
+
 ### Qualitative Comparison: Manual Rig vs. Automatic Deduction
 <p align="center">
-  <img src="C.png" alt="Qualitative comparison between manual rig and automatic deduction" width="1200"/>
+  <img src="comparison-texture-close-unrigged.png" alt="Unrigged Close-up" width="45%"/> <img src="comparison-texture-close-rigged.png" alt="Rigged Close-up" width="45%"/>
   <br>
-  <em>Figure 1: Side-by-side comparison of the final Gaussian Splatting render. <b>Left:</b> Result using the manual rig configuration with fixed intrinsics. Note the sharp textures on the deck and crisp building edges. <b>Right:</b> Result using unconstrained automatic deduction. Note the overall softness, muddy textures, and loss of structural definition.</em>
-</p>
-
-<p align="center">
-  <img src="F.png" alt="Unrigged Close-up" width="45%"/> <img src="H.png" alt="Rigged Close-up" width="45%"/>
-  <br>
-  <em>Figure 2: Close-up texture comparison. <b>Left (Unrigged/F.png):</b> The wall and floor textures are washed out with "cloudy" artifacts. <b>Right (Rigged/H.png):</b> The same surface shows distinct, sharp weathering details.</em>
+  <em>Figure 2: Close-up texture comparison. <br/><b>Left :</b> The wall and floor textures are washed out with "cloudy" artifacts. <br/><b>Right :</b> The same surface shows distinct, sharp weathering details.</em>
   <br><br>
-  <img src="G.png" alt="Unrigged Wide" width="45%"/> <img src="I.png" alt="Rigged Wide" width="45%"/>
+  <img src="comparison-structure-wide-unrigged.png" alt="Unrigged Wide" width="45%"/> <img src="comparison-structure-wide-rigged.png" alt="Rigged Wide" width="45%"/>
   <br>
-  <em>Figure 3: Wide-angle structural comparison. <b>Left (Unrigged/G.png):</b> Distant objects like the bench and pot lack definition. <b>Right (Rigged/I.png):</b> The geometry remains stable and sharp even at a distance.</em>
+  <em>Figure 3: Wide-angle structural comparison. <br/><b>Left :</b> Distant objects like the bench and pot lack definition. <br/><b>Right :</b> The geometry remains stable and sharp even at a distance.</em>
 </p>
 
 ## Conclusion
-*   **Verdict:** Manually enforcing camera intrinsics (`PINHOLE`) and a zero-translation rig configuration is **essential** when working with 360° equirectangular sources.
-*   **Recommendation:** Always override the default Blender addon's `location` values to `[0,0,0]` in the COLMAP `rig_config.json`. This transforms the problem from solving hundreds of independent camera poses to solving a much smaller number of rig poses, dramatically improving reconstruction quality and reliability for Gaussian Splatting.
+*   **Verdict:** Manually enforcing camera intrinsics (`PINHOLE`) and a zero-translation rig configuration is **essential** when working with 360° equi-rectangular sources.
+*   **Recommendation:** Always override the default Blender addon's `location` values to `[0,0,0]` when using equi-rectangular video in the blender addon, in the COLMAP `rig_config.json`. This transforms the problem from solving hundreds of independent camera poses to solving a much smaller number of rig poses, dramatically improving reconstruction quality and reliability for Gaussian Splatting.
 
 ## Future Work: Quantitative Analysis
 To rigorously validate the qualitative improvements observed, future experiments will quantify the difference between the two methods using the following metrics:

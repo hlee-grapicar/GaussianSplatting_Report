@@ -23,5 +23,6 @@ When creating new reports or READMEs, adhere to the following structure to maint
           <em>Figure X: Caption.</em>
         </p>
         ```
+    *   **Side-by-Side Comparisons:** When presenting comparison images, the "Failure/Negative" case should be on the **Left** and the "Success/Positive" case should be on the **Right**.
 *   **Results & Conclusion:**
     *   Summary of outcomes and recommendations.
