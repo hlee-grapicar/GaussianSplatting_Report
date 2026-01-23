@@ -36,7 +36,7 @@
     *   **Definition:** The [Pinhole model](https://colmap.github.io/cameras.html) is the simplest projection model, defined solely by Focal Length ($f_x, f_y$) and Principal Point ($c_x, c_y$). It assumes a perfect projection with no radial or tangential distortion, making it ideal for synthetic data.
 *   **Parameters:**
     *   **Resolution:** $1920 \times 1920$
-    *   **Focal Length ($f_x, f_y$):** $960, 960$ (calculated as half of the image resolution, corresponding to a 90° FOV).
+    *   **Focal Length ($f_x, f_y$):** $960, 960$ (derived from $f = \frac{W}{2 \tan(FOV/2)}$ where $W=1920$ and $FOV=90^\circ$).
     *   **Principal Point ($c_x, c_y$):** $960, 960$ (geometric center of the image).
 
 ## Methodology: COLMAP Configuration

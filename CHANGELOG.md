@@ -1,3 +1,9 @@
+## 2026-01-23
+
+### Fixed
+
+- Corrected the focal length ($f_x, f_y$) calculation logic in `colmap-camera-intrinsics/README.md`. It is now properly defined using the FOV formula ($f = \frac{W}{2 \tan(FOV/2)}$) instead of being incorrectly attributed to half the resolution.
+
 ## 2026-01-16
 
 ### New Features
